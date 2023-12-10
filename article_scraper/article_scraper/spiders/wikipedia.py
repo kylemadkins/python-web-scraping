@@ -1,6 +1,6 @@
 from scrapy.spiders import CrawlSpider, Rule
 from scrapy.linkextractors import LinkExtractor
-import w3lib.html
+from article_scraper.items import Article
 
 
 class WikipediaSpider(CrawlSpider):
@@ -12,12 +12,15 @@ class WikipediaSpider(CrawlSpider):
         Rule(LinkExtractor(allow=r"wiki/((?!:).)*$"), callback="parse", follow=True)
     ]
 
+    custom_settings = {"FEED_URI": "articles.json", "FEED_FORMAT": "json"}
+
     def parse(self, response):
-        return {
-            "title": response.xpath("//h1/span/text()").get()
+        article = Article(
+            title=response.xpath("//h1/span/text()").get()
             or response.xpath("//h1/i/text()").get(),
-            "url": response.url,
-            "last_edited": w3lib.html.remove_tags(
-                response.xpath("//li[@id='footer-info-lastmod']").get()
-            ),
-        }
+            url=response.url,
+            last_updated_utc=response.xpath(
+                "//li[@id='footer-info-lastmod']/text()"
+            ).get(),
+        )
+        return article
