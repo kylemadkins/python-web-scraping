@@ -1,6 +1,6 @@
 from scrapy.spiders import CrawlSpider, Rule
 from scrapy.linkextractors import LinkExtractor
-from article_scraper.items import Article
+from article_crawler.items import Article
 
 
 class WikipediaSpider(CrawlSpider):
@@ -12,7 +12,9 @@ class WikipediaSpider(CrawlSpider):
         Rule(LinkExtractor(allow=r"wiki/((?!:).)*$"), callback="parse", follow=True)
     ]
 
-    custom_settings = {"FEED_URI": "articles.json", "FEED_FORMAT": "json"}
+    custom_settings = {
+        "FEEDS": {"articles.json": {"format": "json", "overwrite": True}}
+    }
 
     def parse(self, response):
         article = Article(
