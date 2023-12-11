@@ -13,7 +13,12 @@ class WikipediaSpider(CrawlSpider):
     ]
 
     custom_settings = {
-        "FEEDS": {"articles.json": {"format": "json", "overwrite": True}}
+        "CLOSESPIDER_PAGECOUNT": 10,
+        "FEEDS": {"articles.json": {"format": "json", "overwrite": True}},
+        "ITEM_PIPELINES": {
+            "article_crawler.pipelines.ValidateArticlePipeline": 100,
+            "article_crawler.pipelines.CleanDatePipeline": 200,
+        },
     }
 
     def parse(self, response):
