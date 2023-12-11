@@ -5,9 +5,23 @@
 
 
 # useful for handling different item types with a single interface
-from itemadapter import ItemAdapter
+from scrapy.exceptions import DropItem
+from datetime import datetime
 
 
-class ArticleScraperPipeline:
-    def process_item(self, item, spider):
-        return item
+class ValidateArticlePipeline:
+    def process_item(self, article, spider):
+        if not article["last_updated"] or not article["url"] or not article["title"]:
+            raise DropItem("Missing data")
+        return article
+
+
+class CleanDatePipeline:
+    def process_item(self, article, spider):
+        article["last_updated"] = (
+            article["last_updated"].replace("This page was last edited on", "").strip()
+        )
+        article["last_updated"] = datetime.strptime(
+            article["last_updated"], "%d %B %Y, at %H:%M"
+        )
+        return article

@@ -21,8 +21,6 @@ class WikipediaSpider(CrawlSpider):
             title=response.xpath("//h1/span/text()").get()
             or response.xpath("//h1/i/text()").get(),
             url=response.url,
-            last_updated_utc=response.xpath(
-                "//li[@id='footer-info-lastmod']/text()"
-            ).get(),
+            last_updated=response.xpath("//li[@id='footer-info-lastmod']/text()").get(),
         )
         return article
